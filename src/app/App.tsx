@@ -1,6 +1,7 @@
 import { createBrowserRouter, Outlet, RouterProvider } from 'react-router'
 import { Backdrop } from '../components/Backdrop'
 import { BottomNav } from '../components/BottomNav'
+import { AuthGate } from '../features/auth/AuthGate'
 import { ChatScreen } from '../features/chat/ChatScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { ComingSoon } from '../features/placeholder/ComingSoon'
@@ -8,12 +9,9 @@ import { ComingSoon } from '../features/placeholder/ComingSoon'
 /** Phone-width column, centred on larger screens. */
 function Frame() {
   return (
-    <>
-      <Backdrop />
-      <div className="relative mx-auto h-dvh max-w-[480px]">
-        <Outlet />
-      </div>
-    </>
+    <div className="relative mx-auto h-dvh max-w-[480px]">
+      <Outlet />
+    </div>
   )
 }
 
@@ -51,5 +49,12 @@ const router = createBrowserRouter([
 ])
 
 export function App() {
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <Backdrop />
+      <AuthGate>
+        <RouterProvider router={router} />
+      </AuthGate>
+    </>
+  )
 }

@@ -12,6 +12,7 @@ npm run dev        # dev server (also on LAN, for testing on a phone)
 npm run check      # typecheck + lint + format check — run before every push
 npm run build      # production build (includes service worker)
 npm run format     # auto-format
+npx wrangler dev   # run the production Worker locally (after npm run build)
 ```
 
 ## Rules
@@ -29,8 +30,11 @@ npm run format     # auto-format
   buttons, touch targets ≥ 44 px, `dir="auto"` on user-written text.
 - **Copy.** Short, plain, warm English. No cheesy lines.
 - **Time.** Store UTC, render with `src/lib/time.ts`. Never hard-code a zone in UI code.
-- **Privacy.** No analytics or tracking. Never commit secrets — `.env` is ignored;
-  public config goes in `.env.example`.
+- **Privacy.** No analytics or tracking. Never commit secrets. `.env` holds
+  public config only (committed); secrets go in `.env.local` (ignored).
+- **Supabase only via the proxy.** Use the client in `src/lib/supabase.ts`
+  (`/supabase` on our own origin). Never call `*.supabase.co` from the app.
+- **Database changes** go in a new file in `supabase/migrations/`, with RLS.
 - **Structure.** Feature code in `src/features/<feature>/`, shared UI in
   `src/components/`, helpers in `src/lib/`. Named exports. Function components.
 

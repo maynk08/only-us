@@ -3,8 +3,8 @@
 A private little world for two. Chat, hugs, and our story — as a web app you can
 install on your phone.
 
-> Status: **Phase 0 — foundation.** The home and chat screens run with sample
-> data; the backend comes next. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> Status: **Phase 1 — backend & deploy.** Login and the Supabase proxy are built; home
+> and chat still show sample data. See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Run it locally (Mac)
 
@@ -28,6 +28,7 @@ The moon/sun button on the home screen switches between Light and Dusk.
 - [Design](docs/DESIGN.md) — Rose Glass design system
 - [Architecture](docs/ARCHITECTURE.md) — stack and key decisions
 - [Roadmap](docs/ROADMAP.md) — phases and progress
+- [Setup](docs/SETUP.md) — Supabase and Cloudflare, step by step
 - [CLAUDE.md](CLAUDE.md) — coding guidelines
 
 ## Credits
