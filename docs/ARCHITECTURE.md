@@ -9,7 +9,7 @@ Everything runs on free tiers. No server of our own to maintain.
  │ Service worker   │              │ + /supabase proxy ────┼────────▶ │ Postgres + RLS       │
  │ (offline, push)  │ ◀── push ─── │                       │          │ Realtime (chat)      │
  └──────────────────┘              └──────────────────────┘          │ Storage (media)      │
-                                                                      │ Edge Functions (push)│
+                                                                      │ Edge Functions       │
                                                                       └──────────────────────┘
 ```
 
@@ -24,7 +24,7 @@ Everything runs on free tiers. No server of our own to maintain.
 | Backend  | Supabase: Auth, Postgres (RLS), Realtime, Storage, Edge Functions |
 | Hosting  | Cloudflare Worker with static assets (`wrangler.jsonc`)           |
 | Proxy    | Same Worker: `/supabase/*` → Supabase (`worker/index.ts`)         |
-| Push     | Web Push (VAPID) sent from a Supabase Edge Function               |
+| Push     | Web Push (VAPID) sent by the same Worker (`worker/push.ts`)       |
 
 ## Key decisions
 
@@ -40,6 +40,12 @@ Everything runs on free tiers. No server of our own to maintain.
 - **Exactly two accounts.** Public sign-up disabled; Row Level Security limits
   every table to members (users with a row in `profiles`). Schema lives in
   `supabase/migrations/`; setup steps in [SETUP.md](SETUP.md).
+- **Push notifications from the Worker.** After a message is saved, the
+  sender's app calls `POST /api/push`. The Worker checks the sender's login,
+  reads the message and the partner's devices with that same login (RLS
+  applies; no service key exists anywhere), and sends encrypted Web Push
+  messages. The service worker (`public/push-handler.js`) shows them unless the
+  app is already on screen. VAPID keys are Cloudflare secrets.
 - **Email + password**, not magic links (Supabase's free email sender is too
   rate-limited).
 - **Media:** photos compressed client-side (~300 KB) before upload.

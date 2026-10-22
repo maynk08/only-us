@@ -71,7 +71,27 @@ code in [`worker/`](../worker)).
 5. From then on every push to `main` deploys automatically, and other branches
    get preview links shown on the GitHub commit / pull request.
 
-## 3. Local development (Mac)
+## 3. Push notifications
+
+Notifications are sent by the Cloudflare Worker (`worker/push.ts`) using Web
+Push. It needs one database table and a key pair (VAPID keys).
+
+1. **Database:** in Supabase **SQL Editor**, run
+   [`supabase/migrations/20261022000000_push_subscriptions.sql`](../supabase/migrations/20261022000000_push_subscriptions.sql).
+2. **Keys:** on the Mac, run `npx web-push generate-vapid-keys`. It prints a
+   **Public Key** and a **Private Key**. Keep the private key secret.
+3. **Cloudflare:** **Workers & Pages → only-us → Settings → Variables and
+   Secrets → Add**. Add two variables, both with type **Secret**:
+   - `VAPID_PUBLIC_KEY` = the public key
+   - `VAPID_PRIVATE_KEY` = the private key
+4. **Each phone:** open the app → **Turn on** on the home screen → **Allow**.
+5. If notifications are late or missing, the app has phone-specific tips at
+   `/notifications` (Motorola, Infinix).
+
+Changing the keys later turns notifications off on every device; each phone
+then has to tap **Turn on** again.
+
+## 4. Local development (Mac)
 
 ```bash
 npm install

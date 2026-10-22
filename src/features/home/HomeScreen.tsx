@@ -5,6 +5,7 @@ import { HugOrb } from '../../components/HugOrb'
 import { ImageIcon, MoonIcon, SparkleIcon, SunIcon } from '../../components/icons'
 import { Toast } from '../../components/Toast'
 import { useCouple, useMessages } from '../../data/context'
+import { NotificationsCard } from '../notifications/NotificationsCard'
 import { useTheme } from '../../lib/theme'
 import { daysSince, formatClock, formatLongDate, isSameLocalDay } from '../../lib/time'
 import { useNow } from '../../lib/useNow'
@@ -57,6 +58,8 @@ export function HomeScreen() {
           {theme === 'light' ? <MoonIcon size={20} /> : <SunIcon size={20} />}
         </button>
       </header>
+
+      <NotificationsCard />
 
       <section className="glass glass-lg flex flex-col gap-1.5 rounded-[32px] px-[22px] pt-5 pb-[18px]">
         <div className="flex items-center justify-between text-muted">

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { notifyPartner } from '../lib/push'
 import { supabase } from '../lib/supabase'
 import type { Message, MessageContent, MessageRow } from '../types'
 import { MessagesContext, useCouple, type MessagesState } from './context'
@@ -87,6 +88,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     setMessages((list) =>
       list.map((m) => (m.id === id ? ({ ...m, status: error ? 'failed' : undefined } as Message) : m)),
     )
+    if (!error) notifyPartner(id)
   }, [])
 
   const send = useCallback(
