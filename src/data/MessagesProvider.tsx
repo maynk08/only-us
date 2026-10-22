@@ -130,10 +130,11 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
   }, [partnerId])
 
   const clearIncoming = useCallback(() => setIncoming(null), [])
+  const unread = useMemo(() => messages.filter((m) => m.sender === 'partner' && !m.seenAt).length, [messages])
 
   const value = useMemo<MessagesState>(
-    () => ({ messages, loaded, send, retry, markSeen, incoming, clearIncoming }),
-    [messages, loaded, send, retry, markSeen, incoming, clearIncoming],
+    () => ({ messages, loaded, unread, send, retry, markSeen, incoming, clearIncoming }),
+    [messages, loaded, unread, send, retry, markSeen, incoming, clearIncoming],
   )
 
   return <MessagesContext.Provider value={value}>{children}</MessagesContext.Provider>

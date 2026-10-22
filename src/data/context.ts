@@ -13,6 +13,8 @@ export interface MessagesState {
   messages: Message[]
   /** True once the first page has loaded from the server. */
   loaded: boolean
+  /** Messages from the partner I haven't opened the chat for yet. */
+  unread: number
   send: (content: MessageContent) => void
   retry: (id: string) => void
   /** Mark everything the partner sent as seen. */

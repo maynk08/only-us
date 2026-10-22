@@ -85,8 +85,8 @@ Push. It needs one database table and a key pair (VAPID keys).
    - `VAPID_PUBLIC_KEY` = the public key
    - `VAPID_PRIVATE_KEY` = the private key
 4. **Each phone:** open the app → **Turn on** on the home screen → **Allow**.
-5. If notifications are late or missing, the app has phone-specific tips at
-   `/notifications` (Motorola, Infinix).
+5. If notifications are late or missing, set **Chrome → App battery usage →
+   Unrestricted** in the phone's settings.
 
 Changing the keys later turns notifications off on every device; each phone
 then has to tap **Turn on** again.

@@ -1,4 +1,5 @@
 import { buildPushPayload, type VapidKeys } from '@block65/webcrypto-web-push'
+import { hugName } from '../src/lib/hug'
 
 export interface PushEnv {
   SUPABASE_URL: string
@@ -120,12 +121,15 @@ export async function handlePush(request: Request, env: PushEnv): Promise<Respon
 export function describe(message: MessageRow, senderName: string): NotificationPayload {
   const base = { tag: `msg-${message.id}`, kind: message.kind, url: '/chat' }
   switch (message.kind) {
-    case 'hug': {
-      const seconds = Math.max(1, Math.round(Number(message.meta?.heldMs) / 1000) || 1)
-      return { ...base, title: `A hug from ${senderName}`, body: `Held for ${seconds}s`, url: '/' }
-    }
+    case 'hug':
+      return {
+        ...base,
+        title: `${senderName} sent you ${hugName(Number(message.meta?.heldMs) || 0)}`,
+        body: 'Open the app to hug back',
+        url: '/',
+      }
     case 'nudge':
-      return { ...base, title: `${senderName} is thinking of you`, body: 'Tap to say hi', url: '/' }
+      return { ...base, title: `${senderName} is thinking of you`, body: 'Let them know you are too', url: '/' }
     case 'text': {
       const text = message.body ?? ''
       // One notification per chat, replaced by the newest message.

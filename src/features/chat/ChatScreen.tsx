@@ -14,11 +14,34 @@ export function ChatScreen() {
   const now = useNow()
   const { couple, partnerOnline, partnerTyping, sendTyping } = useCouple()
   const { messages, loaded, send, retry, markSeen } = useMessages()
-  const endRef = useRef<HTMLDivElement>(null)
+  const listRef = useRef<HTMLElement>(null)
   const partner = couple.partner
 
+  // Stay pinned to the newest message when the list shrinks (keyboard opens)
+  // or grows — unless the reader has scrolled up to look at older ones.
+  const pinnedRef = useRef(true)
   useEffect(() => {
-    endRef.current?.scrollIntoView({ block: 'end' })
+    const list = listRef.current
+    if (!list) return
+    const onScroll = () => {
+      pinnedRef.current = list.scrollHeight - list.scrollTop - list.clientHeight < 80
+    }
+    const observer = new ResizeObserver(() => {
+      if (pinnedRef.current) list.scrollTop = list.scrollHeight
+    })
+    observer.observe(list)
+    list.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      observer.disconnect()
+      list.removeEventListener('scroll', onScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Scroll only the message list — scrollIntoView would also scroll the page
+    // itself and push the message box under the keyboard.
+    const list = listRef.current
+    if (list) list.scrollTop = list.scrollHeight
   }, [messages.length, partnerTyping])
 
   // Reading the chat marks the partner's messages as seen — decided from the
@@ -69,7 +92,7 @@ export function ChatScreen() {
         </button>
       </header>
 
-      <main aria-label="Messages" className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 pt-2 pb-3">
+      <main ref={listRef} aria-label="Messages" className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 pt-2 pb-3">
         <div className="mt-auto" />
         {loaded && messages.length === 0 && (
           <p className="self-center py-6 text-center text-sm text-muted">No messages yet. Say hello.</p>
@@ -99,7 +122,6 @@ export function ChatScreen() {
           )
         })}
         {partnerTyping && <TypingIndicator />}
-        <div ref={endRef} />
       </main>
 
       <Composer onSend={(text) => send({ kind: 'text', text })} onTyping={sendTyping} />
