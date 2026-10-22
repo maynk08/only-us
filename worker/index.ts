@@ -1,12 +1,14 @@
 /**
- * Cloudflare Worker: serves the built app and proxies Supabase under
- * /supabase/* so the phones only ever talk to our own domain. Some ISPs have
- * blocked supabase.co before — see docs/ARCHITECTURE.md.
+ * Cloudflare Worker: serves the built app, proxies Supabase under /supabase/*
+ * so the phones only ever talk to our own domain (some ISPs have blocked
+ * supabase.co before — see docs/ARCHITECTURE.md), and sends push
+ * notifications under /api/push.
  */
 
-interface Env {
+import { handlePush, handlePushKey, type PushEnv } from './push'
+
+interface Env extends PushEnv {
   ASSETS: Fetcher
-  SUPABASE_URL: string
 }
 
 const PREFIX = '/supabase'
@@ -16,6 +18,8 @@ export default {
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url)
     if (url.pathname.startsWith(`${PREFIX}/`)) return proxyToSupabase(request, url, env)
+    if (url.pathname === '/api/push/key') return handlePushKey(env)
+    if (url.pathname === '/api/push') return handlePush(request, env)
     return env.ASSETS.fetch(request)
   },
 } satisfies ExportedHandler<Env>

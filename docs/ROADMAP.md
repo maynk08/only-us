@@ -35,11 +35,12 @@ Each phase ends with something usable. Design keeps improving along the way.
 - [ ] Photos (client-side compression), viewer
 - [ ] Voice notes (record, upload, playback)
 
-## Phase 4 — Hugs & push
+## Phase 4 — Hugs & push (current)
 
-- [ ] Hug / Thinking of You stored and delivered in real time
+- [x] Hug / Thinking of You stored and delivered in real time
 - [ ] Full-screen hug animation, Hug Sync
-- [ ] Web Push (VAPID) via Edge Function; notification setup guide (Moto, Infinix)
+- [x] Web Push (VAPID) sent by the Cloudflare Worker; turn-on card; notification guide (Moto, Infinix)
+- [ ] Owner: run push migration, add VAPID secrets, turn on on both phones (see SETUP.md §3)
 
 ## Phase 5 — Our Story
 

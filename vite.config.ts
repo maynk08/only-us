@@ -45,7 +45,9 @@ export default defineConfig(({ mode }) => {
           // cached) the first time a message actually needs them.
           globIgnores: ['**/*-{vietnamese,latin-ext}-*.woff2'],
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/supabase\//],
+          navigateFallbackDenylist: [/^\/(supabase|api)\//],
+          // Push + notification-click handlers live in a plain file next to the app.
+          importScripts: ['push-handler.js'],
           runtimeCaching: [
             {
               urlPattern: ({ request }) => request.destination === 'font',
