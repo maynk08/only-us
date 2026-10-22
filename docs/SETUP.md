@@ -42,9 +42,9 @@ update public.couple set together_since = '2024-09-05';
 ### 1c. Logging in
 
 The login screen asks for a **name** and **password**. A name without `@`
-becomes `<name>@example.com` (configured in `.env` as
+becomes `<name>@only-us.com` (configured in `.env` as
 `VITE_LOGIN_EMAIL_DOMAIN`). A full email address also works. So if the accounts
-are `me@example.com` and `her@example.com`, the names are `me` and `her`.
+are `me@only-us.com` and `she@only-us.com`, the names are `me` and `she`.
 
 Forgotten password → **Authentication → Users → (user) → Update user** in the
 dashboard.

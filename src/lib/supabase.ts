@@ -10,7 +10,7 @@ export const supabase = createClient(`${location.origin}/supabase`, import.meta.
   },
 })
 
-/** "her" → "her@example.com"; full email addresses pass through unchanged. */
+/** "me" → "me@<VITE_LOGIN_EMAIL_DOMAIN>"; full email addresses pass through unchanged. */
 export function loginNameToEmail(name: string): string {
   const trimmed = name.trim().toLowerCase()
   return trimmed.includes('@') ? trimmed : `${trimmed}@${import.meta.env.VITE_LOGIN_EMAIL_DOMAIN}`
