@@ -1,0 +1,279 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/fraunces/soft.css';
+@import '@fontsource-variable/fraunces/soft-italic.css';
+@import '@fontsource-variable/figtree';
+
+/*
+ * Design tokens. Components never use raw hex values — only these variables
+ * (via the Tailwind theme below or var(--…) in CSS). See docs/DESIGN.md.
+ */
+
+/* Light (default) */
+:root {
+  color-scheme: light;
+
+  --bg: #fff8f4;
+  --text: #2b1a1f;
+  --text-muted: #6e5a5f;
+  --text-faint: rgba(43, 26, 31, 0.25);
+
+  --rose: #8f3048;
+  --rose-deep: #6e2236;
+  --blush: #e8b7b7;
+  --peach: #f2c4a8;
+  --ivory: #fff8f5; /* text on rose surfaces, same in both modes */
+  --sand: #ebd9d3;
+  --online: #c2456a;
+
+  --glass-fill: linear-gradient(160deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.3));
+  --glass-edge: linear-gradient(
+    140deg,
+    rgba(255, 255, 255, 0.75),
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.35)
+  );
+  --glass-shadow: 0 14px 34px rgba(143, 48, 72, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --glass-shadow-lg: 0 24px 60px rgba(143, 48, 72, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --glass-lens: rgba(143, 48, 72, 0.12);
+  --icon-well: rgba(143, 48, 72, 0.1);
+
+  --bubble-theirs-fill: linear-gradient(165deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72));
+  --bubble-theirs-shadow:
+    0 12px 26px -10px rgba(143, 48, 72, 0.3), 0 2px 5px rgba(143, 48, 72, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+  --blob-1: rgba(232, 183, 183, 0.95);
+  --blob-2: rgba(242, 196, 168, 0.7);
+  --blob-3: rgba(217, 138, 155, 0.4);
+  --blob-4: rgba(232, 183, 183, 0.85);
+  --blob-5: rgba(143, 48, 72, 0.22);
+  --grain-opacity: 0.07;
+  --grain-blend: multiply;
+
+  --dashed: #d9b9b2;
+  --accent-text: #8f3048;
+}
+
+/* Dusk */
+:root[data-theme='dusk'] {
+  color-scheme: dark;
+
+  --bg: #2a0e1b;
+  --text: #fff8f4;
+  --text-muted: rgba(255, 248, 244, 0.72);
+  --text-faint: rgba(255, 248, 244, 0.4);
+  --online: #ffb4c1;
+
+  --glass-fill: linear-gradient(160deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.06));
+  --glass-shadow: 0 14px 34px rgba(20, 4, 10, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --glass-shadow-lg: 0 24px 60px rgba(20, 4, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --glass-lens: rgba(255, 255, 255, 0.24);
+  --icon-well: rgba(255, 255, 255, 0.12);
+
+  --bubble-theirs-fill: linear-gradient(165deg, rgba(255, 255, 255, 0.23), rgba(255, 255, 255, 0.09));
+  --bubble-theirs-shadow:
+    0 12px 26px -10px rgba(10, 2, 6, 0.55), 0 2px 5px rgba(10, 2, 6, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+
+  --blob-1: rgba(143, 48, 72, 0.95);
+  --blob-2: rgba(232, 183, 183, 0.55);
+  --blob-3: rgba(242, 196, 168, 0.35);
+  --blob-4: rgba(143, 48, 72, 0.85);
+  --blob-5: rgba(90, 30, 58, 0.9);
+  --grain-opacity: 0.13;
+  --grain-blend: overlay;
+
+  --dashed: rgba(255, 255, 255, 0.35);
+  --accent-text: #f6caca;
+}
+
+@theme {
+  --font-serif: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'Figtree Variable', system-ui, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-rose: var(--rose);
+  --color-rose-deep: var(--rose-deep);
+  --color-blush: var(--blush);
+  --color-peach: var(--peach);
+  --color-ivory: var(--ivory);
+  --color-online: var(--online);
+  --color-accent: var(--accent-text);
+  --color-lens: var(--glass-lens);
+  --color-well: var(--icon-well);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Rounded "soft" serif everywhere Fraunces is used. */
+.font-serif {
+  font-variation-settings:
+    'SOFT' 100,
+    'WONK' 0;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ---------- Surfaces ---------- */
+
+/*
+ * Real backdrop blur is expensive on low-end phones. Use .glass (blurred) only
+ * for a few floating surfaces per screen; use .glass-flat for anything repeated
+ * (lists, bubbles).
+ */
+@utility glass {
+  background:
+    var(--glass-fill) padding-box,
+    var(--glass-edge) border-box;
+  border: 1px solid transparent;
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  box-shadow: var(--glass-shadow);
+}
+
+@utility glass-lg {
+  box-shadow: var(--glass-shadow-lg);
+}
+
+@utility glass-flat {
+  background:
+    var(--glass-fill) padding-box,
+    var(--glass-edge) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--glass-shadow);
+}
+
+/* The glossy 3D rose sphere used for hug and record buttons. */
+@utility orb {
+  background: radial-gradient(circle at 32% 26%, #d7728a 0%, #a63a55 38%, #7a2139 76%, #5e1a2e 100%);
+  box-shadow:
+    0 12px 26px rgba(60, 10, 26, 0.45),
+    inset 0 1px 3px rgba(255, 255, 255, 0.4),
+    inset 0 -8px 18px rgba(40, 6, 16, 0.35);
+  color: var(--ivory);
+}
+
+@utility bubble-mine {
+  background: linear-gradient(160deg, #c9607c 0%, #9c3753 48%, #7c243f 100%);
+  color: var(--ivory);
+  box-shadow:
+    0 12px 24px -10px rgba(122, 33, 57, 0.75),
+    0 2px 5px rgba(122, 33, 57, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 8px rgba(60, 10, 26, 0.25);
+}
+
+@utility bubble-theirs {
+  background:
+    var(--bubble-theirs-fill) padding-box,
+    var(--glass-edge) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--bubble-theirs-shadow);
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes hug-squeeze {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(1.07, 0.93);
+  }
+  55% {
+    transform: scale(0.97, 1.04);
+  }
+  70% {
+    transform: scale(1.02, 0.99);
+  }
+}
+
+@keyframes heart-float {
+  0% {
+    transform: translateY(6px) scale(0.5);
+    opacity: 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-9px) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@keyframes orb-breath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translateY(0) rotate(-10deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(-30px) rotate(10deg);
+    opacity: 0;
+  }
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

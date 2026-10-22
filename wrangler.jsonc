@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "only-us",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // Everything else is served straight from static assets.
+    "run_worker_first": ["/supabase/*"],
+  },
+  "vars": {
+    "SUPABASE_URL": "https://laywfuhtlcbhencsmrnb.supabase.co",
+  },
+}

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#fff8f4" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <title>only us</title>
+    <script>
+      // Apply the saved theme before first paint to avoid a light→dusk flash.
+      try {
+        if (localStorage.getItem('only-us:theme') === 'dusk') {
+          document.documentElement.dataset.theme = 'dusk'
+          document.querySelector('meta[name="theme-color"]').content = '#2a0e1b'
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
