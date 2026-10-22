@@ -116,8 +116,6 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
   )
 
   const markSeen = useCallback(() => {
-    const unseen = messagesRef.current.some((m) => m.sender === 'partner' && !m.seenAt)
-    if (!unseen) return
     const seenAt = new Date().toISOString()
     // Mark locally first so this doesn't repeat; Realtime confirms it for the sender.
     setMessages((list) => list.map((m) => (m.sender === 'partner' && !m.seenAt ? { ...m, seenAt } : m)))
