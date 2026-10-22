@@ -21,13 +21,16 @@ export function ChatScreen() {
     endRef.current?.scrollIntoView({ block: 'end' })
   }, [messages.length, partnerTyping])
 
-  // Reading the chat marks the partner's messages as seen.
+  // Reading the chat marks the partner's messages as seen — decided from the
+  // messages this screen is showing, so a new arrival is marked straight away.
+  const hasUnseen = messages.some((m) => m.sender === 'partner' && !m.seenAt)
   useEffect(() => {
+    if (!hasUnseen) return
     if (document.visibilityState === 'visible') markSeen()
     const onVisible = () => document.visibilityState === 'visible' && markSeen()
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
-  }, [messages, markSeen])
+  }, [hasUnseen, markSeen])
 
   const lastSeenMine = messages.findLast((m) => m.sender === 'me' && m.seenAt && m.kind !== 'hug')
   const status = partnerTyping
