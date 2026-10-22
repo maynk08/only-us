@@ -5,7 +5,6 @@ import { AuthGate } from '../features/auth/AuthGate'
 import { ChatScreen } from '../features/chat/ChatScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
 import { IncomingMoments } from '../features/moments/IncomingMoments'
-import { NotificationsGuide } from '../features/notifications/NotificationsGuide'
 import { ComingSoon } from '../features/placeholder/ComingSoon'
 
 /** Phone-width column, centred on larger screens. */
@@ -33,20 +32,9 @@ const router = createBrowserRouter([
     children: [
       {
         element: <TabLayout />,
-        children: [
-          { index: true, element: <HomeScreen /> },
-          {
-            path: 'story',
-            element: <ComingSoon title="Our Story" note="Your timeline of moments together lands in phase 5." />,
-          },
-          {
-            path: 'stickers',
-            element: <ComingSoon title="Stickers" note="Sticker packs and your own photo stickers land in phase 6." />,
-          },
-        ],
+        children: [{ index: true, element: <HomeScreen /> }],
       },
       { path: 'chat', element: <ChatScreen /> },
-      { path: 'notifications', element: <NotificationsGuide /> },
       { path: '*', element: <ComingSoon title="Lost?" note="This page doesn't exist." /> },
     ],
   },

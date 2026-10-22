@@ -1,6 +1,7 @@
 import { FloatingHeart } from '../../components/HugOrb'
 import { HugCharacter } from '../../components/HugCharacter'
 import { HeartIcon, PlayIcon, SparkleIcon } from '../../components/icons'
+import { hugName } from '../../lib/hug'
 import { formatClock } from '../../lib/time'
 import type { Message } from '../../types'
 
@@ -126,7 +127,6 @@ function VoiceNote({ id, durationSec, mine }: { id: string; durationSec: number;
 
 function HugMoment({ message, partnerName }: { message: Extract<Message, { kind: 'hug' }>; partnerName: string }) {
   const fromMe = message.sender === 'me'
-  const seconds = Math.max(1, Math.round(message.heldMs / 1000))
   return (
     <div className="glass glass-lg relative my-2 flex items-center gap-3.5 self-center rounded-[30px] py-3 pr-[22px] pl-3">
       <div className="orb flex h-[60px] w-[60px] items-center justify-center rounded-full">
@@ -135,9 +135,11 @@ function HugMoment({ message, partnerName }: { message: Extract<Message, { kind:
         </span>
       </div>
       <div className="flex flex-col">
-        <span className="font-serif text-[19px] italic">{fromMe ? 'You sent a hug' : `A hug from ${partnerName}`}</span>
+        <span className="max-w-[210px] font-serif text-[18px] leading-snug italic">
+          {fromMe ? `You sent ${hugName(message.heldMs)}` : `${partnerName} sent you ${hugName(message.heldMs)}`}
+        </span>
         <span className="text-xs text-muted">
-          held for {seconds} {seconds === 1 ? 'second' : 'seconds'} · {formatClock(message.sentAt)}
+          {formatClock(message.sentAt)}
           {message.status === 'failed' ? ' · not sent' : ''}
         </span>
       </div>

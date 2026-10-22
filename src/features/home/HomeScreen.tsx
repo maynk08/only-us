@@ -2,10 +2,12 @@ import { useCallback, useState } from 'react'
 import { Link } from 'react-router'
 import { Avatar } from '../../components/Avatar'
 import { HugOrb } from '../../components/HugOrb'
-import { ImageIcon, MoonIcon, SparkleIcon, SunIcon } from '../../components/icons'
+import { UnreadBadge } from '../../components/BottomNav'
+import { ChatIcon, MoonIcon, SparkleIcon, SunIcon } from '../../components/icons'
 import { Toast } from '../../components/Toast'
 import { useCouple, useMessages } from '../../data/context'
 import { NotificationsCard } from '../notifications/NotificationsCard'
+import { hugName } from '../../lib/hug'
 import { useTheme } from '../../lib/theme'
 import { daysSince, formatClock, formatLongDate, isSameLocalDay } from '../../lib/time'
 import { useNow } from '../../lib/useNow'
@@ -14,7 +16,7 @@ export function HomeScreen() {
   const now = useNow()
   const { theme, toggle } = useTheme()
   const { couple, partnerOnline } = useCouple()
-  const { messages, send } = useMessages()
+  const { messages, unread, send } = useMessages()
   const [toast, setToast] = useState<string | null>(null)
   const clearToast = useCallback(() => setToast(null), [])
 
@@ -23,12 +25,12 @@ export function HomeScreen() {
 
   const sendHug = (heldMs: number) => {
     send({ kind: 'hug', heldMs })
-    setToast(`Hug sent · ${(heldMs / 1000).toFixed(1)}s`)
+    setToast(`You sent ${partner.name} ${hugName(heldMs)}`)
   }
 
   const sendNudge = () => {
     send({ kind: 'nudge' })
-    setToast(`Sent to ${partner.name}`)
+    setToast(`Thinking of you — sent to ${partner.name}`)
   }
 
   return (
@@ -102,13 +104,14 @@ export function HomeScreen() {
           Thinking of you
         </button>
         <Link
-          to="/story"
+          to="/chat"
           className="glass flex h-16 items-center gap-2 rounded-[22px] px-2.5 text-[13.5px] font-semibold whitespace-nowrap text-text no-underline"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-well">
-            <ImageIcon size={18} />
+          <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-well">
+            <ChatIcon size={18} />
+            {unread > 0 && <UnreadBadge count={unread} className="absolute -top-1 -right-1" />}
           </span>
-          On this day
+          {unread > 0 ? `${unread} new ${unread === 1 ? 'message' : 'messages'}` : 'Open chat'}
         </Link>
       </section>
     </div>

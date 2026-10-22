@@ -28,6 +28,7 @@ Each phase ends with something usable. Design keeps improving along the way.
 - [x] Hugs and Thinking of You saved as messages; pop-up when one arrives while the app is open
 - [ ] Offline queue (send automatically when back online)
 - [x] Typing, online presence, read receipts
+- [x] Unread count on the Chat tab and home; message box stays above the keyboard
 - [ ] Replies, reactions, emoji picker, jumbo emoji
 
 ## Phase 3 — Media
@@ -39,8 +40,9 @@ Each phase ends with something usable. Design keeps improving along the way.
 
 - [x] Hug / Thinking of You stored and delivered in real time
 - [ ] Full-screen hug animation, Hug Sync
-- [x] Web Push (VAPID) sent by the Cloudflare Worker; turn-on card; notification guide (Moto, Infinix)
-- [ ] Owner: run push migration, add VAPID secrets, turn on on both phones (see SETUP.md §3)
+- [x] Web Push (VAPID) sent by the Cloudflare Worker; turn-on card
+- [x] Owner: run push migration, add VAPID secrets, turn on (see SETUP.md §3)
+- [x] Hug wording by how long it was held (quick / warm / long / tightest)
 
 ## Phase 5 — Our Story
 

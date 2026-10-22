@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { HugCharacter } from '../../components/HugCharacter'
 import { SparkleIcon } from '../../components/icons'
 import { useCouple, useMessages } from '../../data/context'
+import { hugName } from '../../lib/hug'
 
 const SHOW_MS = 3500
 
@@ -28,19 +29,21 @@ export function IncomingMoments() {
     <button
       type="button"
       onClick={clearIncoming}
-      className="glass glass-lg fixed top-[calc(16px+env(safe-area-inset-top))] left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 rounded-full py-2 pr-6 pl-2 text-left text-text"
-      style={{ animation: 'rise-in 260ms ease-out' }}
+      className="glass glass-lg fixed inset-x-4 top-[calc(16px+env(safe-area-inset-top))] z-30 mx-auto flex w-fit max-w-[440px] items-center gap-3 rounded-full py-2 pr-6 pl-2 text-left text-text"
+      style={{
+        animation: 'rise-in 260ms ease-out',
+        // Mostly opaque: it floats over busy content like the header.
+        background:
+          'linear-gradient(160deg, color-mix(in srgb, var(--bg) 94%, transparent), color-mix(in srgb, var(--bg) 84%, transparent)) padding-box, var(--glass-edge) border-box',
+      }}
     >
       <span className="orb flex h-12 w-12 shrink-0 items-center justify-center rounded-full">
         {isHug ? <HugCharacter size={36} withHeart /> : <SparkleIcon size={20} />}
       </span>
       <span className="flex flex-col">
         <span className="font-serif text-[17px] italic">
-          {isHug ? `A hug from ${name}` : `${name} is thinking of you`}
+          {incoming.kind === 'hug' ? `${name} sent you ${hugName(incoming.heldMs)}` : `${name} is thinking of you`}
         </span>
-        {isHug && incoming.kind === 'hug' && (
-          <span className="text-xs text-muted">held for {Math.max(1, Math.round(incoming.heldMs / 1000))}s</span>
-        )}
       </span>
     </button>
   )

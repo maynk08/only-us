@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
 import { HugCharacter } from '../../components/HugCharacter'
 import { enablePush, getPushState, refreshPushSubscription, type PushState } from '../../lib/push'
 
@@ -8,23 +7,12 @@ export function NotificationsCard() {
   const [state, setState] = useState<PushState | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [justEnabled, setJustEnabled] = useState(false)
 
   useEffect(() => {
     getPushState().then(setState)
     refreshPushSubscription()
   }, [])
 
-  if (state === 'on' && justEnabled) {
-    return (
-      <section role="status" className="glass flex items-center justify-between gap-3 rounded-[26px] px-4 py-3">
-        <p className="text-sm font-semibold">Notifications are on</p>
-        <Link to="/notifications" className="text-sm font-semibold text-accent">
-          Phone tips
-        </Link>
-      </section>
-    )
-  }
   if (state === null || state === 'on' || state === 'unsupported') return null
 
   const turnOn = async () => {
@@ -33,7 +21,6 @@ export function NotificationsCard() {
     try {
       const next = await enablePush()
       setState(next)
-      setJustEnabled(next === 'on')
     } catch {
       setError("Couldn't turn them on. Check your connection and try again.")
     } finally {
@@ -50,12 +37,7 @@ export function NotificationsCard() {
         {state === 'denied' ? (
           <>
             <p className="text-sm font-semibold">Notifications are blocked</p>
-            <p className="text-xs text-muted">
-              Allow them in Chrome: ⋮ → Settings → Site settings → Notifications.{' '}
-              <Link to="/notifications" className="font-semibold">
-                Help
-              </Link>
-            </p>
+            <p className="text-xs text-muted">Allow them in Chrome: ⋮ → Settings → Site settings → Notifications.</p>
           </>
         ) : (
           <>
