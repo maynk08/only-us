@@ -4,12 +4,14 @@ import { BottomNav } from '../components/BottomNav'
 import { AuthGate } from '../features/auth/AuthGate'
 import { ChatScreen } from '../features/chat/ChatScreen'
 import { HomeScreen } from '../features/home/HomeScreen'
+import { IncomingMoments } from '../features/moments/IncomingMoments'
 import { ComingSoon } from '../features/placeholder/ComingSoon'
 
 /** Phone-width column, centred on larger screens. */
 function Frame() {
   return (
     <div className="relative mx-auto h-dvh max-w-[480px]">
+      <IncomingMoments />
       <Outlet />
     </div>
   )

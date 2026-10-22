@@ -1,6 +1,6 @@
 import { FloatingHeart } from '../../components/HugOrb'
 import { HugCharacter } from '../../components/HugCharacter'
-import { HeartIcon, PlayIcon } from '../../components/icons'
+import { HeartIcon, PlayIcon, SparkleIcon } from '../../components/icons'
 import { formatClock } from '../../lib/time'
 import type { Message } from '../../types'
 
@@ -8,10 +8,13 @@ interface MessageBubbleProps {
   message: Message
   /** Previous message is from the same sender — tightens the joining corner. */
   joinsPrevious: boolean
+  partnerName: string
+  onRetry: (id: string) => void
 }
 
-export function MessageBubble({ message, joinsPrevious }: MessageBubbleProps) {
-  if (message.kind === 'hug') return <HugMoment message={message} />
+export function MessageBubble({ message, joinsPrevious, partnerName, onRetry }: MessageBubbleProps) {
+  if (message.kind === 'hug') return <HugMoment message={message} partnerName={partnerName} />
+  if (message.kind === 'nudge') return <Nudge message={message} partnerName={partnerName} />
 
   const mine = message.sender === 'me'
   const top = joinsPrevious ? 8 : 22
@@ -46,9 +49,18 @@ export function MessageBubble({ message, joinsPrevious }: MessageBubbleProps) {
           <VoiceNote id={message.id} durationSec={message.durationSec} mine={mine} />
         )}
         <span className={`relative pb-px text-[10.5px] whitespace-nowrap ${mine ? 'text-ivory/80' : 'text-muted'}`}>
-          {time}
+          {message.status === 'sending' ? 'Sending…' : time}
         </span>
       </div>
+      {message.status === 'failed' && (
+        <button
+          type="button"
+          onClick={() => onRetry(message.id)}
+          className="mt-1 min-h-8 px-1 text-xs font-semibold text-accent"
+        >
+          Not sent · Tap to retry
+        </button>
+      )}
       {message.reactions?.includes('love') && (
         <span
           role="img"
@@ -112,8 +124,9 @@ function VoiceNote({ id, durationSec, mine }: { id: string; durationSec: number;
   )
 }
 
-function HugMoment({ message }: { message: Extract<Message, { kind: 'hug' }> }) {
+function HugMoment({ message, partnerName }: { message: Extract<Message, { kind: 'hug' }>; partnerName: string }) {
   const fromMe = message.sender === 'me'
+  const seconds = Math.max(1, Math.round(message.heldMs / 1000))
   return (
     <div className="glass glass-lg relative my-2 flex items-center gap-3.5 self-center rounded-[30px] py-3 pr-[22px] pl-3">
       <div className="orb flex h-[60px] w-[60px] items-center justify-center rounded-full">
@@ -122,13 +135,29 @@ function HugMoment({ message }: { message: Extract<Message, { kind: 'hug' }> }) 
         </span>
       </div>
       <div className="flex flex-col">
-        <span className="font-serif text-[19px] italic">{fromMe ? 'You sent a hug' : 'Sent you a hug'}</span>
+        <span className="font-serif text-[19px] italic">{fromMe ? 'You sent a hug' : `A hug from ${partnerName}`}</span>
         <span className="text-xs text-muted">
-          held for {Math.round(message.heldMs / 1000)} seconds{fromMe ? '' : ' · tap to feel it'}
+          held for {seconds} {seconds === 1 ? 'second' : 'seconds'} · {formatClock(message.sentAt)}
+          {message.status === 'failed' ? ' · not sent' : ''}
         </span>
       </div>
       <FloatingHeart className="top-1.5 right-[18px]" size={12} color="var(--blush)" />
       <FloatingHeart className="top-3 right-10" size={9} color="var(--peach)" delay="1.3s" />
+    </div>
+  )
+}
+
+function Nudge({ message, partnerName }: { message: Message; partnerName: string }) {
+  const fromMe = message.sender === 'me'
+  return (
+    <div className="glass-flat my-1 flex items-center gap-2 self-center rounded-full py-1.5 pr-4 pl-1.5 text-[13px]">
+      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-well text-accent">
+        <SparkleIcon size={15} />
+      </span>
+      <span>
+        {fromMe ? `You're thinking of ${partnerName}` : `${partnerName} is thinking of you`}
+        <span className="text-muted"> · {formatClock(message.sentAt)}</span>
+      </span>
     </div>
   )
 }

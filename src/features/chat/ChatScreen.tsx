@@ -1,33 +1,38 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router'
 import { Avatar } from '../../components/Avatar'
 import { HugCharacter } from '../../components/HugCharacter'
 import { BackIcon } from '../../components/icons'
-import { couple, initialMessages } from '../../data/mock'
-import { formatClock } from '../../lib/time'
+import { useCouple, useMessages } from '../../data/context'
+import { formatClock, formatDayLabel, isSameLocalDay } from '../../lib/time'
 import { useNow } from '../../lib/useNow'
-import type { Message, MessageContent } from '../../types'
 import { Composer } from './Composer'
 import { MessageBubble } from './MessageBubble'
 
 export function ChatScreen() {
   const navigate = useNavigate()
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
+  const now = useNow()
+  const { couple, partnerOnline, partnerTyping, sendTyping } = useCouple()
+  const { messages, loaded, send, retry, markSeen } = useMessages()
   const endRef = useRef<HTMLDivElement>(null)
+  const partner = couple.partner
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' })
-  }, [messages.length])
+  }, [messages.length, partnerTyping])
 
-  const now = useNow()
+  // Reading the chat marks the partner's messages as seen.
+  useEffect(() => {
+    if (document.visibilityState === 'visible') markSeen()
+    const onVisible = () => document.visibilityState === 'visible' && markSeen()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [messages, markSeen])
 
-  const append = (content: MessageContent) =>
-    setMessages((list) => [
-      ...list,
-      { ...content, id: crypto.randomUUID(), sender: 'me', sentAt: new Date().toISOString() },
-    ])
-
-  const lastSeenMine = [...messages].reverse().find((m) => m.sender === 'me' && m.seenAt && m.kind !== 'hug')
+  const lastSeenMine = messages.findLast((m) => m.sender === 'me' && m.seenAt && m.kind !== 'hug')
+  const status = partnerTyping
+    ? 'typing…'
+    : `${partnerOnline ? 'Here now' : 'Away'} · ${formatClock(now, partner.timeZone)} there`
 
   return (
     <div className="flex h-full flex-col">
@@ -41,16 +46,18 @@ export function ChatScreen() {
           <BackIcon />
         </button>
         <div className="glass flex h-[52px] items-center gap-2.5 rounded-full pr-[18px] pl-1.5">
-          <Avatar initial={couple.partner.initial} online />
+          <Avatar initial={partner.initial} online={partnerOnline} />
           <div className="flex flex-col">
-            <span className="font-serif text-[17px] leading-tight font-medium">{couple.partner.name}</span>
-            <span className="text-[11px] text-muted">Here now · {formatClock(now, couple.partner.timeZone)}</span>
+            <span className="font-serif text-[17px] leading-tight font-medium">{partner.name}</span>
+            <span className="text-[11px] text-muted" aria-live="polite">
+              {status}
+            </span>
           </div>
         </div>
         <button
           type="button"
           aria-label="Send a hug"
-          onClick={() => append({ kind: 'hug', heldMs: 2000 })}
+          onClick={() => send({ kind: 'hug', heldMs: 2000 })}
           className="orb flex h-12 w-12 items-center justify-center rounded-full"
         >
           <span className="-mt-0.5">
@@ -60,24 +67,39 @@ export function ChatScreen() {
       </header>
 
       <main aria-label="Messages" className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 pt-2 pb-3">
-        <span className="mt-auto self-center py-1 pb-2 font-serif text-sm text-muted italic">Tonight</span>
+        <div className="mt-auto" />
+        {loaded && messages.length === 0 && (
+          <p className="self-center py-6 text-center text-sm text-muted">No messages yet. Say hello.</p>
+        )}
         {messages.map((message, i) => {
           const prev = messages[i - 1]
-          const joinsPrevious = !!prev && prev.sender === message.sender && prev.kind !== 'hug'
+          const newDay = !prev || !isSameLocalDay(prev.sentAt, message.sentAt)
+          const joinsPrevious =
+            !newDay && !!prev && prev.sender === message.sender && prev.kind !== 'hug' && prev.kind !== 'nudge'
           return (
-            <div key={message.id} className="contents">
-              <MessageBubble message={message} joinsPrevious={joinsPrevious} />
+            <Fragment key={message.id}>
+              {newDay && (
+                <span className="self-center py-1 pb-2 font-serif text-sm text-muted italic">
+                  {formatDayLabel(message.sentAt, now)}
+                </span>
+              )}
+              <MessageBubble
+                message={message}
+                joinsPrevious={joinsPrevious}
+                partnerName={partner.name}
+                onRetry={retry}
+              />
               {message === lastSeenMine && (
                 <span className="self-end pr-1.5 text-[11px] text-muted">Seen {formatClock(message.seenAt!)}</span>
               )}
-            </div>
+            </Fragment>
           )
         })}
-        <TypingIndicator />
+        {partnerTyping && <TypingIndicator />}
         <div ref={endRef} />
       </main>
 
-      <Composer onSend={(text) => append({ kind: 'text', text })} />
+      <Composer onSend={(text) => send({ kind: 'text', text })} onTyping={sendTyping} />
     </div>
   )
 }
