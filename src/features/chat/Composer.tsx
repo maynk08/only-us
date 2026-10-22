@@ -1,19 +1,40 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { MicIcon, PlusIcon, SendIcon, SmileIcon } from '../../components/icons'
+
+const TYPING_PING_MS = 2500
 
 interface ComposerProps {
   onSend: (text: string) => void
+  onTyping: (typing: boolean) => void
 }
 
-export function Composer({ onSend }: ComposerProps) {
+export function Composer({ onSend, onTyping }: ComposerProps) {
   const [text, setText] = useState('')
+  const lastPingRef = useRef(0)
   const hasText = text.trim().length > 0
+
+  const stopTyping = () => {
+    if (lastPingRef.current === 0) return
+    lastPingRef.current = 0
+    onTyping(false)
+  }
+
+  const change = (value: string) => {
+    setText(value)
+    if (!value.trim()) return stopTyping()
+    const now = Date.now()
+    if (now - lastPingRef.current > TYPING_PING_MS) {
+      lastPingRef.current = now
+      onTyping(true)
+    }
+  }
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (!hasText) return
     onSend(text.trim())
     setText('')
+    stopTyping()
   }
 
   return (
@@ -32,9 +53,11 @@ export function Composer({ onSend }: ComposerProps) {
             type="text"
             dir="auto"
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => change(e.target.value)}
+            onBlur={stopTyping}
             placeholder="Message"
             enterKeyHint="send"
+            autoComplete="off"
             className="h-11 w-full min-w-0 border-none bg-transparent text-[15px] text-text outline-none placeholder:text-muted"
           />
         </label>
@@ -49,6 +72,8 @@ export function Composer({ onSend }: ComposerProps) {
       <button
         type={hasText ? 'submit' : 'button'}
         aria-label={hasText ? 'Send message' : 'Record voice note'}
+        // Keep the keyboard open when tapping send.
+        onPointerDown={(e) => hasText && e.preventDefault()}
         className="orb flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full"
       >
         {hasText ? <SendIcon size={21} /> : <MicIcon size={21} />}

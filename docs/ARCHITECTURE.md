@@ -55,7 +55,7 @@ src/
   components/     Shared UI (icons, HugCharacter, HugOrb, BottomNav, …)
   features/       One folder per feature: home/, chat/, story/, stickers/
   lib/            Framework-free helpers (time, theme, hooks)
-  data/           Mock data (until the backend lands)
+  data/           Supabase data: couple + presence, live messages (providers, row mapping)
   styles/         index.css — tokens, utilities, keyframes
   types.ts        Shared domain types
 worker/           Cloudflare Worker (serves app, proxies Supabase)

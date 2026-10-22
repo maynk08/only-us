@@ -4,24 +4,31 @@ import { Avatar } from '../../components/Avatar'
 import { HugOrb } from '../../components/HugOrb'
 import { ImageIcon, MoonIcon, SparkleIcon, SunIcon } from '../../components/icons'
 import { Toast } from '../../components/Toast'
-import { couple } from '../../data/mock'
+import { useCouple, useMessages } from '../../data/context'
 import { useTheme } from '../../lib/theme'
-import { daysSince, formatClock, formatLongDate } from '../../lib/time'
+import { daysSince, formatClock, formatLongDate, isSameLocalDay } from '../../lib/time'
 import { useNow } from '../../lib/useNow'
 
 export function HomeScreen() {
   const now = useNow()
   const { theme, toggle } = useTheme()
-  const [hugsToday, setHugsToday] = useState(7)
+  const { couple, partnerOnline } = useCouple()
+  const { messages, send } = useMessages()
   const [toast, setToast] = useState<string | null>(null)
   const clearToast = useCallback(() => setToast(null), [])
 
+  const { me, partner, togetherSince } = couple
+  const hugsToday = messages.filter((m) => m.kind === 'hug' && isSameLocalDay(m.sentAt, now)).length
+
   const sendHug = (heldMs: number) => {
-    setHugsToday((n) => n + 1)
+    send({ kind: 'hug', heldMs })
     setToast(`Hug sent · ${(heldMs / 1000).toFixed(1)}s`)
   }
 
-  const days = daysSince(couple.togetherSince, now)
+  const sendNudge = () => {
+    send({ kind: 'nudge' })
+    setToast(`Sent to ${partner.name}`)
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -30,11 +37,16 @@ export function HomeScreen() {
       <header className="flex items-center justify-between">
         <div className="glass flex h-12 items-center gap-2.5 rounded-full pr-4 pl-1.5">
           <div className="flex">
-            <Avatar initial={couple.me.initial} size={36} tone="sand" />
-            <Avatar initial={couple.partner.initial} size={36} className="-ml-2.5" />
+            <Avatar initial={me.initial} size={36} tone="sand" />
+            <Avatar initial={partner.initial} size={36} className="-ml-2.5" />
           </div>
-          <span className="text-sm font-semibold">You're both here</span>
-          <span className="h-2 w-2 rounded-full bg-online" style={{ boxShadow: '0 0 10px var(--online)' }} />
+          <span className="text-sm font-semibold">
+            {partnerOnline ? "You're both here" : `${partner.name} is away`}
+          </span>
+          <span
+            className={`h-2 w-2 rounded-full ${partnerOnline ? 'bg-online' : 'bg-faint'}`}
+            style={partnerOnline ? { boxShadow: '0 0 10px var(--online)' } : undefined}
+          />
         </div>
         <button
           type="button"
@@ -49,10 +61,10 @@ export function HomeScreen() {
       <section className="glass glass-lg flex flex-col gap-1.5 rounded-[32px] px-[22px] pt-5 pb-[18px]">
         <div className="flex items-center justify-between text-muted">
           <span className="text-[11px] font-semibold tracking-[2px] uppercase">Together for</span>
-          <span className="text-xs">since {formatLongDate(couple.togetherSince)}</span>
+          {togetherSince && <span className="text-xs">since {formatLongDate(togetherSince)}</span>}
         </div>
         <p className="font-serif text-[60px] leading-[1.05] font-light tracking-[-1px]">
-          {days} <span className="text-accent italic">days</span>
+          {togetherSince ? daysSince(togetherSince, now) : '—'} <span className="text-accent italic">days</span>
         </p>
         <div
           className="my-2 h-px"
@@ -61,7 +73,7 @@ export function HomeScreen() {
         <dl className="grid grid-cols-2 gap-3">
           <div>
             <dt className="text-xs text-muted">Time there</dt>
-            <dd className="font-serif text-xl">{formatClock(now, couple.partner.timeZone)}</dd>
+            <dd className="font-serif text-xl">{formatClock(now, partner.timeZone)}</dd>
           </div>
           <div>
             <dt className="text-xs text-muted">Hugs today</dt>
@@ -78,8 +90,8 @@ export function HomeScreen() {
       <section className="grid grid-cols-2 gap-3">
         <button
           type="button"
-          onClick={() => setToast('Thinking of you — sent')}
-          className="glass flex h-16 items-center gap-2 rounded-[22px] px-2.5 text-[13.5px] whitespace-nowrap text-left font-semibold text-text"
+          onClick={sendNudge}
+          className="glass flex h-16 items-center gap-2 rounded-[22px] px-2.5 text-left text-[13.5px] font-semibold whitespace-nowrap text-text"
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-well">
             <SparkleIcon size={18} />
@@ -88,7 +100,7 @@ export function HomeScreen() {
         </button>
         <Link
           to="/story"
-          className="glass flex h-16 items-center gap-2 rounded-[22px] px-2.5 text-[13.5px] whitespace-nowrap font-semibold text-text no-underline"
+          className="glass flex h-16 items-center gap-2 rounded-[22px] px-2.5 text-[13.5px] font-semibold whitespace-nowrap text-text no-underline"
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-well">
             <ImageIcon size={18} />

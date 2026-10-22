@@ -35,3 +35,23 @@ export function formatLongDate(localDate: string): string {
     new Date(y, m - 1, d),
   )
 }
+
+export function isSameLocalDay(a: Date | string, b: Date | string): boolean {
+  const x = new Date(a)
+  const y = new Date(b)
+  return x.getFullYear() === y.getFullYear() && x.getMonth() === y.getMonth() && x.getDate() === y.getDate()
+}
+
+/** "Today", "Yesterday" or "21 Oct" — for date separators in the chat. */
+export function formatDayLabel(iso: string, now: Date = new Date()): string {
+  if (isSameLocalDay(iso, now)) return 'Today'
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  if (isSameLocalDay(iso, yesterday)) return 'Yesterday'
+  const sameYear = new Date(iso).getFullYear() === now.getFullYear()
+  return new Intl.DateTimeFormat('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: sameYear ? undefined : 'numeric',
+  }).format(new Date(iso))
+}
